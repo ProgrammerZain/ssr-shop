@@ -15,7 +15,7 @@ export function MobileMenu() {
   const closeMenu = () => setIsOpen(false);
 
   return (
-    <div className="sm:hidden">
+    <div className="lg:hidden">
       <button
         onClick={toggleMenu}
         aria-label={isOpen ? "Close main menu" : "Open main menu"}
@@ -48,28 +48,57 @@ export function MobileMenu() {
 
       {isOpen && (
         <div className="absolute top-16 left-0 right-0 bg-slate-950/95 backdrop-blur-xl border-b border-slate-800 p-4 space-y-3 shadow-xl animate-fade-in z-50">
-          <nav className="flex flex-col space-y-3">
+          <nav className="flex flex-col space-y-2">
             <NavLink
               href="/"
               onClick={closeMenu}
               className="py-2 px-3 rounded-lg hover:bg-slate-900"
             >
-              Home
+              Home Overview
             </NavLink>
             <NavLink
               href="/products"
               onClick={closeMenu}
               className="py-2 px-3 rounded-lg hover:bg-slate-900 flex items-center justify-between"
             >
-              <span>Products</span>
-              <Badge variant="emerald">Upcoming</Badge>
+              <span>Product Catalog</span>
+              <Badge variant="blue">SSR</Badge>
             </NavLink>
             <NavLink
-              href="/about"
+              href="/search"
               onClick={closeMenu}
               className="py-2 px-3 rounded-lg hover:bg-slate-900"
             >
-              About Lab
+              Catalog Search
+            </NavLink>
+            <NavLink
+              href="/ssr-demo"
+              onClick={closeMenu}
+              className="py-2 px-3 rounded-lg hover:bg-slate-900"
+            >
+              SSR vs CSR Lab
+            </NavLink>
+            <NavLink
+              href="/request-inspector"
+              onClick={closeMenu}
+              className="py-2 px-3 rounded-lg hover:bg-slate-900"
+            >
+              Request Inspector
+            </NavLink>
+            <NavLink
+              href="/cache-lab"
+              onClick={closeMenu}
+              className="py-2 px-3 rounded-lg hover:bg-slate-900 flex items-center justify-between"
+            >
+              <span>Cache & ISR Lab</span>
+              <Badge variant="purple">ISR</Badge>
+            </NavLink>
+            <NavLink
+              href="/actions-lab"
+              onClick={closeMenu}
+              className="py-2 px-3 rounded-lg hover:bg-slate-900"
+            >
+              Server Actions Lab
             </NavLink>
           </nav>
         </div>

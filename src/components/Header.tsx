@@ -28,13 +28,16 @@ export function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden sm:flex items-center gap-8">
+          <nav className="hidden lg:flex items-center gap-6">
             <NavLink href="/">Home</NavLink>
-            <NavLink href="/products">
-              Products
-              <Badge variant="emerald">Upcoming</Badge>
+            <NavLink href="/products">Products</NavLink>
+            <NavLink href="/search">Search</NavLink>
+            <NavLink href="/ssr-demo">SSR vs CSR</NavLink>
+            <NavLink href="/cache-lab">
+              Cache Lab
+              <Badge variant="purple">ISR</Badge>
             </NavLink>
-            <NavLink href="/about">About Lab</NavLink>
+            <NavLink href="/actions-lab">Actions</NavLink>
           </nav>
 
           {/* Mobile Navigation Toggle */}
