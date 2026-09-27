@@ -1,81 +1,105 @@
+import Link from "next/link";
+import { getProducts } from "@/lib/products";
 import { PageHeader } from "@/components/PageHeader";
 import { RenderingInfo } from "@/components/RenderingInfo";
-import { SectionCard } from "@/components/SectionCard";
-import { ModuleCard } from "@/components/ModuleCard";
+import { ProductCard } from "@/components/ProductCard";
 
 export const metadata = {
   title: "Revalidation (ISR) | Cache Lab",
-  description: "Time-based and tag-based Incremental Static Regeneration.",
+  description:
+    "Time-based Incremental Static Regeneration with 10-second revalidation.",
 };
 
-export default function RevalidateCachePage() {
+// Set time-based revalidation to 10 seconds
+export const revalidate = 10;
+
+export default async function RevalidateCachePage() {
+  const currentRenderTimestamp = new Date().toISOString();
+
+  // Fetch product data with 10-second revalidation window
+  const data = await getProducts({ next: { revalidate: 10 } });
+  const products = data.products.slice(0, 3);
+
   return (
     <div className="space-y-8 max-w-5xl mx-auto py-4">
       <PageHeader
-        title="Time & Tag Revalidation (ISR)"
-        description="Demonstrates Incremental Static Regeneration (ISR), allowing static pages to be updated in the background without rebuilding the entire application."
+        title="Time-Based Revalidation (ISR)"
+        description="Demonstrates Incremental Static Regeneration. Data is pre-rendered statically and automatically revalidated in the background every 10 seconds."
         renderingType="REVALIDATED"
         category="Cache Lab / Revalidation"
       />
 
+      {/* Core Principle Banner */}
+      <div className="p-4 rounded-xl border border-teal-500/30 bg-teal-500/10 text-slate-200 text-xs sm:text-sm font-mono">
+        <span className="text-teal-400 font-bold">Fetch Config: </span>
+        <code className="bg-slate-900 px-2 py-0.5 rounded text-slate-100">
+          fetch(&apos;https://dummyjson.com/products&apos;, &#123; next: &#123;
+          revalidate: 10 &#125; &#125;)
+        </code>
+      </div>
+
       <RenderingInfo
         renderingType="REVALIDATED"
         executionTarget="Build-time Pre-render + Background Revalidation"
-        cachingStrategy="next: { revalidate: 60, tags: ['products'] }"
-        dynamicApis="revalidatePath() / revalidateTag()"
-        description="ISR provides the speed of static pre-rendering while periodically updating stale data in the background upon new user requests or explicit cache invalidation tags."
+        cachingStrategy="Stale-While-Revalidate (10 Seconds)"
+        dynamicApis={`Render Timestamp: ${currentRenderTimestamp} | Revalidate Window: 10s`}
+        description="Refreshing within 10 seconds serves the cached static page instantly. Refreshing after 10 seconds triggers a background revalidation update."
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <SectionCard title="What You Will Learn" icon="🎓">
-          <ul className="space-y-2 text-slate-300 text-sm list-disc list-inside">
-            <li>Setting time-based revalidation via <code className="text-teal-400 bg-slate-900 px-1 py-0.5 rounded">next: &#123; revalidate: 60 &#125;</code> or <code className="text-teal-400 bg-slate-900 px-1 py-0.5 rounded">export const revalidate = 60</code>.</li>
-            <li>On-demand revalidation using <code className="text-teal-400 bg-slate-900 px-1 py-0.5 rounded">revalidatePath(&apos;/products&apos;)</code>.</li>
-            <li>Tag-based cache invalidation using <code className="text-teal-400 bg-slate-900 px-1 py-0.5 rounded">revalidateTag(&apos;products&apos;)</code>.</li>
-            <li>Serving stale content instantly while triggering background page updates (Stale-While-Revalidate pattern).</li>
-          </ul>
-        </SectionCard>
-
-        <SectionCard title="Stale-While-Revalidate Cycle" icon="⏱️">
-          <div className="p-4 rounded-lg bg-slate-950/60 border border-slate-800 space-y-3 font-mono text-xs">
-            <div className="flex justify-between border-b border-slate-800/80 pb-2">
-              <span className="text-slate-400">Request within 60s:</span>
-              <span className="text-emerald-400 font-bold">Fast Static HIT</span>
-            </div>
-            <div className="flex justify-between border-b border-slate-800/80 pb-2">
-              <span className="text-slate-400">Request after 60s:</span>
-              <span className="text-teal-400 font-semibold">Serve STALE + Revalidate BG</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-400">Subsequent Hits:</span>
-              <span className="text-emerald-400 font-bold">Fresh Static HIT Served</span>
-            </div>
+      {/* Diagnostics Panel Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-xs">
+        <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
+          <div className="text-slate-400 font-sans text-xs">
+            Current Server Render Timestamp
           </div>
-        </SectionCard>
+          <div className="text-teal-400 font-bold text-sm truncate">
+            {currentRenderTimestamp}
+          </div>
+          <p className="text-[11px] text-slate-500 font-sans pt-1">
+            Updates when revalidation window expires (10s).
+          </p>
+        </div>
+
+        <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800 space-y-1">
+          <div className="text-slate-400 font-sans text-xs">
+            Data Revalidation Strategy
+          </div>
+          <div className="text-emerald-400 font-bold text-sm">
+            STALE-WHILE-REVALIDATE (10s)
+          </div>
+          <p className="text-[11px] text-slate-500 font-sans pt-1">
+            Serves cached content fast while updating BG.
+          </p>
+        </div>
       </div>
 
-      <SectionCard title="Related Modules" icon="🔗">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <ModuleCard
-            title="Static Cache (SSG)"
-            description="Explore build-time pre-rendering."
-            renderingType="STATIC"
-            href="/cache-lab/static"
-          />
-          <ModuleCard
-            title="Dynamic Cache (SSR)"
-            description="Explore fresh server hits per request."
-            renderingType="DYNAMIC"
-            href="/cache-lab/dynamic"
-          />
-          <ModuleCard
-            title="Server Actions Lab"
-            description="Triggering revalidateTag inside Server Actions."
-            renderingType="SERVER"
-            href="/actions-lab"
-          />
+      {/* Product Grid */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2 border-b border-slate-800 pb-3">
+          <span>📦</span> Revalidated Products ({products.length} Items)
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
         </div>
-      </SectionCard>
+      </div>
+
+      {/* Navigation */}
+      <div className="flex items-center justify-between border-t border-slate-800 pt-4">
+        <Link
+          href="/cache-lab/dynamic"
+          className="text-xs text-slate-400 hover:text-white underline font-mono"
+        >
+          &larr; Back to Dynamic Bypass
+        </Link>
+        <Link
+          href="/cache-lab"
+          className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-colors"
+        >
+          Return to Cache Lab Overview &rarr;
+        </Link>
+      </div>
     </div>
   );
 }
