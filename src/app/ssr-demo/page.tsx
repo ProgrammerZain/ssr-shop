@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { RenderingInfo } from "@/components/RenderingInfo";
 import { SectionCard } from "@/components/SectionCard";
 import { ProductCard } from "@/components/ProductCard";
+import { InspectionGuide } from "@/components/InspectionGuide";
 
 export const metadata = {
   title: "Server-Side Rendering (SSR) Demo | Next.js SSR Lab",
@@ -99,34 +100,29 @@ export default async function SsrDemoPage() {
         </div>
       </div>
 
-      {/* SSR vs CSR Architectural Comparison Card */}
-      <SectionCard title="Architectural Comparison: SSR vs. CSR" icon="⚖️">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-          <div className="p-4 rounded-lg bg-blue-500/5 border border-blue-500/20 space-y-2">
-            <h3 className="font-bold text-blue-400 flex items-center gap-2">
-              <span>🖥️</span> Server-Side Rendering (SSR)
-            </h3>
-            <p className="font-mono text-xs text-blue-300 mb-1">
-              Browser &rarr; Next.js Server &rarr; API &rarr; HTML &rarr; Browser
-            </p>
-            <p className="text-slate-300 text-xs leading-relaxed">
-              HTML is pre-populated on the server. The browser receives complete text and markup. Search engines see instant content. Zero API calls originate from the client browser.
-            </p>
-          </div>
-
-          <div className="p-4 rounded-lg bg-amber-500/5 border border-amber-500/20 space-y-2">
-            <h3 className="font-bold text-amber-400 flex items-center gap-2">
-              <span>⚛️</span> Client-Side Rendering (CSR)
-            </h3>
-            <p className="font-mono text-xs text-amber-300 mb-1">
-              Browser &rarr; HTML/JS &rarr; React executes &rarr; API &rarr; UI updates
-            </p>
-            <p className="text-slate-300 text-xs leading-relaxed">
-              Browser receives a blank skeleton. JavaScript runs in the browser, triggering an outbound API fetch. UI updates only after client network request completes.
-            </p>
-          </div>
-        </div>
-      </SectionCard>
+      {/* Educational Inspection Guide */}
+      <InspectionGuide
+        questions={{
+          executionLocation: "Node.js Server Runtime",
+          apiRequestTime: "On incoming HTTP GET request (Server-side)",
+          isHtmlServerGenerated: true,
+          browserReceives: "Fully populated HTML document with product markup",
+          networkTabOutput: "GET /ssr-demo (200 OK) — Zero outbound dummyjson requests",
+          jsRequiredInBrowser: false,
+          isResultCached: "No (bypassed via no-store / force-dynamic)",
+          dataRegenerationTime: "On every incoming HTTP request hit",
+        }}
+        inspectionSteps={{
+          viewSourceTip:
+            "Press Ctrl+U or right-click 'View Page Source'. Search for 'Essence Mascara'. You will find the full text pre-populated in the HTML.",
+          networkTabTip:
+            "Open Network tab and filter by 'Fetch/XHR'. Reload the page. Notice that NO outbound calls to dummyjson.com appear in the browser.",
+          devToolsTip:
+            "Inspect the page elements. The <h3> product title tags exist in the initial HTML before any client JavaScript executes.",
+          serverTerminalTip:
+            "Look at your Node.js dev server terminal output. You will see Next.js compiling and executing the async Server Component.",
+        }}
+      />
     </div>
   );
 }

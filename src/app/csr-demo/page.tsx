@@ -8,6 +8,7 @@ import { RenderingInfo } from "@/components/RenderingInfo";
 import { SectionCard } from "@/components/SectionCard";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductCardSkeleton } from "@/components/skeletons/ProductCardSkeleton";
+import { InspectionGuide } from "@/components/InspectionGuide";
 
 export default function CsrDemoPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -21,7 +22,7 @@ export default function CsrDemoPage() {
     async function fetchProductsFromBrowser() {
       setIsLoading(true);
       try {
-        // Artificial client-side delay of 1.5s to clearly observe client spinner & DevTools network request
+        // Artificial client-side delay of 1.5s to observe client spinner & DevTools network request
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
         const response = await fetch("https://dummyjson.com/products?limit=6");
@@ -152,34 +153,29 @@ export default function CsrDemoPage() {
         )}
       </div>
 
-      {/* SSR vs CSR Architectural Comparison Card */}
-      <SectionCard title="Architectural Comparison: SSR vs. CSR" icon="⚖️">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-          <div className="p-4 rounded-lg bg-blue-500/5 border border-blue-500/20 space-y-2">
-            <h3 className="font-bold text-blue-400 flex items-center gap-2">
-              <span>🖥️</span> Server-Side Rendering (SSR)
-            </h3>
-            <p className="font-mono text-xs text-blue-300 mb-1">
-              Browser &rarr; Next.js Server &rarr; API &rarr; HTML &rarr; Browser
-            </p>
-            <p className="text-slate-300 text-xs leading-relaxed">
-              Zero client fetch waterfalls. Complete product HTML delivered in first byte. No client loading spinners required.
-            </p>
-          </div>
-
-          <div className="p-4 rounded-lg bg-amber-500/5 border border-amber-500/20 space-y-2">
-            <h3 className="font-bold text-amber-400 flex items-center gap-2">
-              <span>⚛️</span> Client-Side Rendering (CSR)
-            </h3>
-            <p className="font-mono text-xs text-amber-300 mb-1">
-              Browser &rarr; HTML/JS &rarr; React executes &rarr; API &rarr; UI updates
-            </p>
-            <p className="text-slate-300 text-xs leading-relaxed">
-              Initial HTML contains no product data. React component mounts in browser, triggers client fetch(), and renders loading state until response completes.
-            </p>
-          </div>
-        </div>
-      </SectionCard>
+      {/* Educational Inspection Guide */}
+      <InspectionGuide
+        questions={{
+          executionLocation: "Browser Client Runtime",
+          apiRequestTime: "After page mounts in browser (useEffect)",
+          isHtmlServerGenerated: false,
+          browserReceives: "Minimal HTML wrapper shell + React JavaScript bundle",
+          networkTabOutput: "GET https://dummyjson.com/products?limit=6 (200 OK)",
+          jsRequiredInBrowser: true,
+          isResultCached: "No (Client SWR/fetch state)",
+          dataRegenerationTime: "Whenever component mounts or state resets",
+        }}
+        inspectionSteps={{
+          viewSourceTip:
+            "Press Ctrl+U or View Source. Notice that the initial HTML does NOT contain the product titles. The container is empty until JS runs.",
+          networkTabTip:
+            "Open Network tab and filter by 'Fetch/XHR'. Reload the page. You will see an explicit GET request to dummyjson.com dispatched by the browser!",
+          devToolsTip:
+            "Observe the DOM during load: it starts with loading skeletons, then mutates once React receives the JSON response.",
+          serverTerminalTip:
+            "Check your server logs. The Node.js server only served the static client shell; it did NOT touch dummyjson.com.",
+        }}
+      />
     </div>
   );
 }
