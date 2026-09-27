@@ -6,6 +6,7 @@ import { RenderingInfo } from "@/components/RenderingInfo";
 import { SectionCard } from "@/components/SectionCard";
 import { Badge } from "@/components/Badge";
 import { ModuleCard } from "@/components/ModuleCard";
+import { ProductActions } from "@/components/ProductActions";
 
 interface ProductDetailPageProps {
   params: Promise<{ id: string }>;
@@ -95,9 +96,39 @@ export default async function ProductDetailPage({
         description="This detail page was dynamically resolved and rendered on the Node.js server runtime per request URL segment."
       />
 
+      {/* Educational Section: Server-rendered UI + Client-side interactivity */}
+      <SectionCard
+        title="Server-rendered UI + Client-side interactivity"
+        icon="🧩"
+      >
+        <div className="space-y-3 text-slate-300 text-xs sm:text-sm leading-relaxed">
+          <p>
+            This product detail page demonstrates an island architecture where static product information is pre-rendered on the server, while interactive controls are isolated inside Client Components:
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs pt-1">
+            <div className="p-3.5 rounded-lg bg-blue-500/10 border border-blue-500/20 space-y-1">
+              <span className="font-bold text-blue-400 font-sans flex items-center gap-1.5">
+                <span>🖥️</span> Server Component (Page & Metadata)
+              </span>
+              <p className="text-slate-300 font-sans text-xs">
+                Product title, description, price, images, stock levels, and SEO metadata are rendered completely on the Node.js server with zero client bundle overhead.
+              </p>
+            </div>
+            <div className="p-3.5 rounded-lg bg-amber-500/10 border border-amber-500/20 space-y-1">
+              <span className="font-bold text-amber-400 font-sans flex items-center gap-1.5">
+                <span>⚛️</span> Client Component (ProductActions)
+              </span>
+              <p className="text-slate-300 font-sans text-xs">
+                Quantity selection, Add to Cart, and Wishlist toggles run in the browser using React 19 <code className="text-amber-300">useOptimistic</code> and <code className="text-purple-300">useTransition</code> for instant visual feedback.
+              </p>
+            </div>
+          </div>
+        </div>
+      </SectionCard>
+
       {/* Product Detail Card */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 rounded-xl border border-slate-800 bg-slate-900/60 shadow-lg">
-        {/* Product Image */}
+        {/* Product Image (Server-rendered) */}
         <div className="relative w-full h-80 sm:h-96 rounded-lg overflow-hidden bg-slate-950/80 border border-slate-800/80 flex items-center justify-center p-4">
           <img
             src={product.thumbnail}
@@ -106,7 +137,7 @@ export default async function ProductDetailPage({
           />
         </div>
 
-        {/* Product Meta Info */}
+        {/* Product Meta Info & Interactive Actions */}
         <div className="space-y-6 flex flex-col justify-between">
           <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -123,7 +154,10 @@ export default async function ProductDetailPage({
 
             {product.brand && (
               <div className="text-xs font-mono text-slate-400">
-                Brand: <span className="text-slate-200 font-semibold">{product.brand}</span>
+                Brand:{" "}
+                <span className="text-slate-200 font-semibold">
+                  {product.brand}
+                </span>
               </div>
             )}
 
@@ -133,7 +167,9 @@ export default async function ProductDetailPage({
 
             <div className="grid grid-cols-2 gap-3 pt-2 font-mono text-xs">
               <div className="p-3 rounded-lg bg-slate-950/60 border border-slate-800/80">
-                <div className="text-slate-500 font-sans text-[10px] uppercase">Availability</div>
+                <div className="text-slate-500 font-sans text-[10px] uppercase">
+                  Availability
+                </div>
                 <div
                   className={`font-semibold mt-0.5 ${
                     product.stock > 0 ? "text-emerald-400" : "text-rose-400"
@@ -146,30 +182,34 @@ export default async function ProductDetailPage({
               </div>
 
               <div className="p-3 rounded-lg bg-slate-950/60 border border-slate-800/80">
-                <div className="text-slate-500 font-sans text-[10px] uppercase">SKU Code</div>
+                <div className="text-slate-500 font-sans text-[10px] uppercase">
+                  SKU Code
+                </div>
                 <div className="text-slate-200 font-semibold mt-0.5">
                   {product.sku || `PROD-${product.id}`}
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between">
-            <div>
+            {/* Price Tag */}
+            <div className="pt-2">
               <div className="text-xs text-slate-400">Price</div>
               <div className="text-3xl font-extrabold text-slate-100 font-mono">
                 ${product.price.toFixed(2)}
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <Link
-                href="/products"
-                className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors"
-              >
-                &larr; Back to Catalog
-              </Link>
-            </div>
+            {/* Isolated Client Component for Interactive Actions */}
+            <ProductActions product={product} />
+          </div>
+
+          <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between">
+            <Link
+              href="/products"
+              className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors"
+            >
+              &larr; Back to Catalog
+            </Link>
           </div>
         </div>
       </div>
@@ -190,10 +230,10 @@ export default async function ProductDetailPage({
             href="/search"
           />
           <ModuleCard
-            title="Revalidation (ISR)"
-            description="Pre-render product pages with ISR."
-            renderingType="REVALIDATED"
-            href="/cache-lab/revalidate"
+            title="Server Actions Lab"
+            description="Mutate data securely using Server Actions."
+            renderingType="SERVER"
+            href="/actions-lab"
           />
         </div>
       </SectionCard>
